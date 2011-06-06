@@ -393,4 +393,7 @@ public interface Transaction<NodeType extends Node, WorkspaceType extends Worksp
      */
     void rollback();
 
+    WorkspaceType getWorkspace( String workspaceName,
+                                boolean readonly );
+
 }

@@ -221,4 +221,9 @@ public abstract class BaseTransaction<NodeType extends Node, WorkspaceType exten
      */
     public void rollback() {
     }
+
+    public WorkspaceType getWorkspace( String workspaceName,
+                                       boolean readonly ) {
+        return repository.getWorkspace(this, workspaceName);
+    }
 }

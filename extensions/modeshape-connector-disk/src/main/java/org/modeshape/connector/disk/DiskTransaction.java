@@ -132,7 +132,7 @@ public class DiskTransaction extends MapTransaction<DiskNode, DiskWorkspace> {
         try {
             super.commit();
         } finally {
-            lock.unlock();
+            if (lock != null) lock.unlock();
         }
     }
 
@@ -146,7 +146,7 @@ public class DiskTransaction extends MapTransaction<DiskNode, DiskWorkspace> {
         try {
             super.rollback();
         } finally {
-            lock.unlock();
+            if (lock != null) lock.unlock();
         }
     }
 

@@ -27,7 +27,6 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.modeshape.common.annotation.ThreadSafe;
@@ -86,8 +85,11 @@ public class DiskRepository extends Repository<DiskNode, DiskWorkspace> {
     @Override
     public DiskTransaction startTransaction( ExecutionContext context,
                                                    boolean readonly ) {
-        final Lock lock = readonly ? this.lock.readLock() : this.lock.writeLock();
-        lock.lock();
-        return new DiskTransaction(context, this, getRootNodeUuid(), lock);
+        // final Lock lock = readonly ? this.lock.readLock() : this.lock.writeLock();
+        // lock.lock();
+        // return new DiskTransaction(context, this, getRootNodeUuid(), lock);
+
+        return new FineGrainedLockingDiskTransaction(context, this, getRootNodeUuid());
+
     }
 }

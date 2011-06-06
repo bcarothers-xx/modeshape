@@ -103,7 +103,7 @@ public class Processor<NodeType extends Node, WorkspaceType extends Workspace> e
      */
     @Override
     public void process( ReadNodeRequest request ) {
-        WorkspaceType workspace = getWorkspace(request, request.inWorkspace());
+        WorkspaceType workspace = getWorkspace(request, request.inWorkspace(), true);
         NodeType node = getTargetNode(workspace, request, request.at());
         if (node == null) {
             assert request.hasError();
@@ -132,7 +132,7 @@ public class Processor<NodeType extends Node, WorkspaceType extends Workspace> e
      */
     @Override
     public void process( ReadAllChildrenRequest request ) {
-        WorkspaceType workspace = getWorkspace(request, request.inWorkspace());
+        WorkspaceType workspace = getWorkspace(request, request.inWorkspace(), true);
         NodeType node = getTargetNode(workspace, request, request.of());
         if (node == null) {
             assert request.hasError();
@@ -162,7 +162,7 @@ public class Processor<NodeType extends Node, WorkspaceType extends Workspace> e
 
     @Override
     public void process( LockBranchRequest request ) {
-        WorkspaceType workspace = getWorkspace(request, request.inWorkspace());
+        WorkspaceType workspace = getWorkspace(request, request.inWorkspace(), false);
         NodeType node = getTargetNode(workspace, request, request.at());
         if (node == null) return;
 
@@ -175,7 +175,7 @@ public class Processor<NodeType extends Node, WorkspaceType extends Workspace> e
 
     @Override
     public void process( UnlockBranchRequest request ) {
-        WorkspaceType workspace = getWorkspace(request, request.inWorkspace());
+        WorkspaceType workspace = getWorkspace(request, request.inWorkspace(), false);
         NodeType node = getTargetNode(workspace, request, request.at());
         if (node == null) return;
 
@@ -188,7 +188,7 @@ public class Processor<NodeType extends Node, WorkspaceType extends Workspace> e
 
     @Override
     public void process( ReadAllPropertiesRequest request ) {
-        WorkspaceType workspace = getWorkspace(request, request.inWorkspace());
+        WorkspaceType workspace = getWorkspace(request, request.inWorkspace(), true);
         NodeType node = getTargetNode(workspace, request, request.at());
         if (node == null) {
             assert request.hasError();
@@ -214,8 +214,8 @@ public class Processor<NodeType extends Node, WorkspaceType extends Workspace> e
     public void process( CloneBranchRequest request ) {
         if (!updatesAllowed(request)) return;
 
-        WorkspaceType workspace = getWorkspace(request, request.fromWorkspace());
-        WorkspaceType newWorkspace = getWorkspace(request, request.intoWorkspace());
+        WorkspaceType workspace = getWorkspace(request, request.fromWorkspace(), true);
+        WorkspaceType newWorkspace = getWorkspace(request, request.intoWorkspace(), false);
         if (workspace == null || newWorkspace == null) return;
         NodeType node = getTargetNode(workspace, request, request.from());
         if (node == null) return;
@@ -249,8 +249,8 @@ public class Processor<NodeType extends Node, WorkspaceType extends Workspace> e
     public void process( CopyBranchRequest request ) {
         if (!updatesAllowed(request)) return;
 
-        WorkspaceType workspace = getWorkspace(request, request.fromWorkspace());
-        WorkspaceType newWorkspace = getWorkspace(request, request.intoWorkspace());
+        WorkspaceType workspace = getWorkspace(request, request.fromWorkspace(), true);
+        WorkspaceType newWorkspace = getWorkspace(request, request.intoWorkspace(), false);
         if (workspace == null || newWorkspace == null) return;
         NodeType node = getTargetNode(workspace, request, request.from());
         if (node == null) return;
@@ -277,7 +277,7 @@ public class Processor<NodeType extends Node, WorkspaceType extends Workspace> e
     public void process( CreateNodeRequest request ) {
         if (!updatesAllowed(request)) return;
 
-        WorkspaceType workspace = getWorkspace(request, request.inWorkspace());
+        WorkspaceType workspace = getWorkspace(request, request.inWorkspace(), false);
         if (workspace == null) return;
 
         // Look up the parent node, which must exist ...
@@ -346,7 +346,7 @@ public class Processor<NodeType extends Node, WorkspaceType extends Workspace> e
     public void process( DeleteBranchRequest request ) {
         if (!updatesAllowed(request)) return;
 
-        WorkspaceType workspace = getWorkspace(request, request.inWorkspace());
+        WorkspaceType workspace = getWorkspace(request, request.inWorkspace(), false);
         if (workspace == null) return;
         NodeType node = getTargetNode(workspace, request, request.at());
         if (node == null) return;
@@ -364,7 +364,7 @@ public class Processor<NodeType extends Node, WorkspaceType extends Workspace> e
     public void process( MoveBranchRequest request ) {
         if (!updatesAllowed(request)) return;
 
-        WorkspaceType workspace = getWorkspace(request, request.inWorkspace());
+        WorkspaceType workspace = getWorkspace(request, request.inWorkspace(), false);
         if (workspace == null) return;
 
         NodeType beforeNode = request.before() != null ? getTargetNode(workspace, request, request.before()) : null;
@@ -409,7 +409,7 @@ public class Processor<NodeType extends Node, WorkspaceType extends Workspace> e
     public void process( UpdatePropertiesRequest request ) {
         if (!updatesAllowed(request)) return;
 
-        WorkspaceType workspace = getWorkspace(request, request.inWorkspace());
+        WorkspaceType workspace = getWorkspace(request, request.inWorkspace(), false);
         NodeType node = getTargetNode(workspace, request, request.on());
         if (node == null) return;
         // Figure out which properties should be set ...
@@ -510,7 +510,7 @@ public class Processor<NodeType extends Node, WorkspaceType extends Workspace> e
      */
     @Override
     public void process( VerifyWorkspaceRequest request ) {
-        WorkspaceType original = getWorkspace(request, request.workspaceName());
+        WorkspaceType original = getWorkspace(request, request.workspaceName(), true);
         if (original != null) {
             Path path = getExecutionContext().getValueFactories().getPathFactory().createRootPath();
             Node root = txn.getRootNode(original);
@@ -526,7 +526,7 @@ public class Processor<NodeType extends Node, WorkspaceType extends Workspace> e
      */
     @Override
     public void process( VerifyNodeExistsRequest request ) {
-        WorkspaceType original = getWorkspace(request, request.inWorkspace());
+        WorkspaceType original = getWorkspace(request, request.inWorkspace(), true);
         if (original != null) {
             try {
                 Location actualLoation = txn.verifyNodeExists(original, request.at());
@@ -587,7 +587,7 @@ public class Processor<NodeType extends Node, WorkspaceType extends Workspace> e
      */
     @Override
     public void process( AccessQueryRequest request ) {
-        WorkspaceType workspace = getWorkspace(request, request.workspace());
+        WorkspaceType workspace = getWorkspace(request, request.workspace(), true);
         if (workspace == null) return;
         QueryResults results = txn.query(workspace, request);
         if (results != null) {
@@ -604,7 +604,7 @@ public class Processor<NodeType extends Node, WorkspaceType extends Workspace> e
      */
     @Override
     public void process( FullTextSearchRequest request ) {
-        WorkspaceType workspace = getWorkspace(request, request.workspace());
+        WorkspaceType workspace = getWorkspace(request, request.workspace(), true);
         if (workspace == null) return;
         QueryResults results = txn.search(workspace, request);
         if (results != null) {
@@ -625,9 +625,10 @@ public class Processor<NodeType extends Node, WorkspaceType extends Workspace> e
     }
 
     protected WorkspaceType getWorkspace( Request request,
-                                          String workspaceName ) {
+                                          String workspaceName,
+                                          boolean readonly ) {
         // Get the workspace for this request ...
-        WorkspaceType workspace = repository.getWorkspace(txn, workspaceName);
+        WorkspaceType workspace = txn.getWorkspace(workspaceName, readonly);
         if (workspace == null) {
             String msg = GraphI18n.workspaceDoesNotExistInRepository.text(workspaceName, repository.getSourceName());
             request.setError(new InvalidWorkspaceException(msg));

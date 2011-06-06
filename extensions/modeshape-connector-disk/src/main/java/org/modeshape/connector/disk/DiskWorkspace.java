@@ -30,6 +30,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.modeshape.graph.connector.base.MapWorkspace;
 
 /**
@@ -37,6 +40,7 @@ import org.modeshape.graph.connector.base.MapWorkspace;
  */
 public class DiskWorkspace extends MapWorkspace<DiskNode> {
 
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private File workspaceRoot;
 
     /**
@@ -82,7 +86,14 @@ public class DiskWorkspace extends MapWorkspace<DiskNode> {
     public void shutdown() {
     }
 
-    static int getCount = 0;
+    Lock readLock() {
+        return lock.readLock();
+    }
+
+    Lock writeLock() {
+        return lock.writeLock();
+    }
+
     @Override
     public DiskNode getNode( UUID uuid ) {
         File nodeFile = fileFor(uuid);
